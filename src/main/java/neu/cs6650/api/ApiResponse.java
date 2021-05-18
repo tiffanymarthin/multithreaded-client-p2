@@ -1,4 +1,4 @@
-package neu.cs6650;
+package neu.cs6650.api;
 
 import java.util.List;
 import java.util.Map;
