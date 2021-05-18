@@ -12,9 +12,9 @@ public class TextbodyApi {
 
   private ApiClient apiClient;
 
-  public TextbodyApi() {
-    this(Configuration.getDefaultApiClient());
-  }
+//  public TextbodyApi() {
+//    this(Configuration.getDefaultApiClient());
+//  }
 
   public TextbodyApi(ApiClient apiClient) {
     this.apiClient = apiClient;
@@ -32,8 +32,8 @@ public class TextbodyApi {
     Object localVarPostBody = body;
 
     // create path and map variables
-    final String localVarPath = "/textbody/" + function;
-    final String localVarContentType = "application/json";
+    final String localVarPath = "/textbody/" + function + "/";
+    final String localVarContentType = "application/json; charset=utf-8";
 
     return apiClient.buildPostCall(localVarPath, localVarPostBody, localVarContentType);
   }
@@ -52,9 +52,8 @@ public class TextbodyApi {
 
   public ResultVal analyzeNewLine(TextLine body, String function) throws ApiException {
     Call call = analyzeValidateNewCall(body, function);
-    Type localVarReturnType = new TypeToken<ResultVal>() {
-    }.getType();
-    ApiResponse<ResultVal> resp = apiClient.execute(call, localVarReturnType);
+    Type localVarReturnType = new TypeToken<ResultVal>(){}.getType();
+//    ApiResponse<ResultVal> resp = apiClient.execute(call, localVarReturnType);
     return resp.getData();
   }
 }
