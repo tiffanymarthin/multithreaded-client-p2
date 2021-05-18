@@ -2,8 +2,11 @@ package neu.cs6650.client;
 
 import com.google.gson.Gson;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
 import neu.cs6650.api.ApiException;
+import neu.cs6650.api.ApiResponse;
 import neu.cs6650.model.TextLine;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
@@ -13,8 +16,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
-public class ApiClient implements Callable<ThreadRecord> {
+public class ApiClient {
 
   private ThreadInput threadInput;
   private String apiRoute;
@@ -28,18 +32,18 @@ public class ApiClient implements Callable<ThreadRecord> {
     this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();
   }
 
-  /**
-   * Computes a result, or throws an exception if unable to do so.
-   *
-   * @return computed result
-   * @throws Exception if unable to compute a result
-   */
-  @Override
-  public ThreadRecord call() throws Exception {
-    return null;
-  }
+  public boolean postRequest(String path, Object postBody, String contentType)
+      throws ApiException {
+    Request request = buildPostCall(path, postBody, contentType);
+//    long startTime = System.currentTimeMillis();
+    try (Response response = client.newCall(request).execute()) {
+      return true;
+    } catch (IOException e) {
+//      e.printStackTrace();
+      return false;
+    }
 
-  private boolean postRequest(String url);
+  }
 
   private Request buildPostCall(String path, Object postBody, String contentType)
       throws ApiException {
@@ -79,14 +83,6 @@ public class ApiClient implements Callable<ThreadRecord> {
   public boolean isJsonMime(String mime) {
     String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
     return mime != null && (mime.matches(jsonMime) || mime.equals("*/*"));
-  }
-
-}
-
-
-
-
-
   }
 
 }
