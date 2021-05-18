@@ -1,9 +1,10 @@
 package neu.cs6650;
 
 import neu.cs6650.client.ApiClient;
+import neu.cs6650.model.ThreadInput;
 
 public class Configuration {
-  private static ApiClient defaultApiClient = new ApiClient();
+//  private static ApiClient defaultApiClient = new ApiClient();
 
   /**
    * Get the default API client, which would be used when creating API
@@ -11,9 +12,9 @@ public class Configuration {
    *
    * @return Default API client
    */
-  public static ApiClient getDefaultApiClient() {
-    return defaultApiClient;
-  }
+//  public static ApiClient getDefaultApiClient() {
+//    return defaultApiClient;
+//  }
 
   /**
    * Set the default API client, which would be used when creating API
@@ -21,7 +22,7 @@ public class Configuration {
    *
    * @param apiClient API client
    */
-  public static void setDefaultApiClient(ApiClient apiClient) {
-    defaultApiClient = apiClient;
-  }
+//  public static void setDefaultApiClient(ApiClient apiClient) {
+//    defaultApiClient = apiClient;
+//  }
 }
