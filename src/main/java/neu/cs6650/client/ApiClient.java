@@ -1,25 +1,31 @@
 package neu.cs6650.client;
 
+import com.google.gson.Gson;
+import java.io.File;
 import java.util.concurrent.Callable;
-import neu.cs6650.ApiException;
+import neu.cs6650.api.ApiException;
 import neu.cs6650.model.TextLine;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import okhttp3.Call;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Request.Builder;
+import okhttp3.RequestBody;
 
-public class WorkerTask implements Callable<ThreadRecord> {
+public class ApiClient implements Callable<ThreadRecord> {
+
   private ThreadInput threadInput;
   private String apiRoute;
 
-  private final static String API_PATH = "/textbody/";
+//  private final static String API_PATH = "/textbody/";
 
   private final OkHttpClient client = new OkHttpClient();
 
-  public WorkerTask(ThreadInput threadInput, String apiRoute) {
+  public ApiClient(ThreadInput threadInput, String apiRoute) {
     this.threadInput = threadInput;
-    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort() + API_PATH;
+    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();
   }
 
   /**
@@ -35,20 +41,48 @@ public class WorkerTask implements Callable<ThreadRecord> {
 
   private boolean postRequest(String url);
 
-  private Request buildRequest(String path, );
+  private Request buildPostCall(String path, Object postBody, String contentType)
+      throws ApiException {
+    final String url = buildUrl(path);
+    final RequestBody reqBody;
 
-  private boolean validateLineBeforeCall(TextLine body, String function) throws ApiException {
-    // verify the required parameter 'body' is set
-    if (body == null) {
-      throw new ApiException("Missing the required parameter 'body'");
-    }
-    // verify the required parameter 'function' is set
-    if (function == null) {
-      throw new ApiException("Missing the required parameter 'function'");
+    if (isJsonMime(contentType)) {
+      String json = postBody.toString();
+      reqBody = RequestBody.create(json, MediaType.parse(contentType));
+    } else {
+      throw new ApiException("Content type \"" + contentType + "\" is not supported");
     }
 
-    Call call = analyzeNewLineCall(body, function);
-    return call;
+    final Request reqBuilder = new Builder()
+        .url(url)
+        .post(reqBody)
+        .build();
+
+    return reqBuilder;
+  }
+
+  private String buildUrl(String path) {
+    return this.apiRoute + path;
+  }
+
+  /**
+   * Check if the given MIME is a JSON MIME.
+   * JSON MIME examples:
+   *   application/json
+   *   application/json; charset=UTF8
+   *   APPLICATION/JSON
+   *   application/vnd.company+json
+   * "* / *" is also default to JSON
+   * @param mime MIME (Multipurpose Internet Mail Extensions)
+   * @return True if the given MIME is JSON, false otherwise.
+   */
+  public boolean isJsonMime(String mime) {
+    String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
+    return mime != null && (mime.matches(jsonMime) || mime.equals("*/*"));
+  }
+
+}
+
 
 
 
