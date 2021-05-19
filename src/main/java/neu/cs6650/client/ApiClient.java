@@ -1,10 +1,8 @@
 package neu.cs6650.client;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
-import neu.cs6650.api.ApiException;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import okhttp3.MediaType;
