@@ -3,6 +3,7 @@ package neu.cs6650.client;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import neu.cs6650.Configuration;
 import neu.cs6650.InputProcessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +13,10 @@ public class Main {
 //  private static final String INPUT_PATH = "input/test.txt";
   private static final String INPUT_PATH = "input/bsds-summer-2021-testdata.txt";
   private static final String POISON_PILL = "-1";
-  private static final String IP_ADD = "localhost";
+
+  private static final String AWS_API_ROUTE = ;
+
+  private static final String IP_ADDRESS = Configuration.IS_LOCAL ? "localhost" : AWS_API_ROUTE;
   private static final String PORT = "8080";
   private static final String FUNCTION = "wordcount";
 
@@ -39,7 +43,7 @@ public class Main {
     new Thread(inputProcessor).start();
 
     logger.info("*********** Client Starts ***********");
-    MultithreadedClient client = new MultithreadedClient(maxThread, blockingQueue, IP_ADD, PORT, FUNCTION, POISON_PILL);
+    MultithreadedClient client = new MultithreadedClient(maxThread, blockingQueue, IP_ADDRESS, PORT, FUNCTION, POISON_PILL);
     startTime = System.currentTimeMillis();
     client.start();
     endTime = System.currentTimeMillis();
