@@ -10,8 +10,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class MultithreadedClient {
+  private static final Logger logger = LogManager.getLogger(ApiClient.class.getName());
 
   private Integer maxThreads;
   private BlockingQueue<String> lineQueue;
@@ -19,6 +22,7 @@ public class MultithreadedClient {
   private String ipAddress;
   private String port;
   private String function;
+  private String poisonPill;
 
   private long totalSuccessfulRequests;
   private long totalFailedRequests;
@@ -27,12 +31,13 @@ public class MultithreadedClient {
   private CompletionService<ThreadRecord> completionService;
 
   public MultithreadedClient(Integer maxThreads,
-      BlockingQueue<String> textInput, String ipAddress, String port, String function) {
+      BlockingQueue<String> textInput, String ipAddress, String port, String function, String poisonPill) {
     this.maxThreads = maxThreads;
     this.lineQueue = textInput;
     this.ipAddress = ipAddress;
     this.port = port;
     this.function = function;
+    this.poisonPill = poisonPill;
     this.executor = Executors.newFixedThreadPool(maxThreads);
     this.completionService = new ExecutorCompletionService<>(this.executor);
   }
@@ -45,7 +50,7 @@ public class MultithreadedClient {
 
   private void submitThreads() {
     ThreadInput threadInput = new ThreadInput(this.ipAddress, this.port);
-    ApiClient apiClient = new ApiClient(threadInput, function, lineQueue);
+    ApiClient apiClient = new ApiClient(lineQueue, threadInput, function, poisonPill);
     for (int i = 0; i < maxThreads; i++) {
       completionService.submit(apiClient);
     }
@@ -60,9 +65,10 @@ public class MultithreadedClient {
         totalFailedRequests += record.getNFailedRequest();
       }
     } catch (InterruptedException e) {
+      logger.error("Thread interrupted");
       Thread.currentThread().interrupt();
     } catch (ExecutionException | CancellationException e) {
-      System.out.println("ee or cancel e");
+      logger.error(e.getMessage());
     }
   }
 
