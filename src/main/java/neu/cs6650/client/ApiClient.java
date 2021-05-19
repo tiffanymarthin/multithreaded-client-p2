@@ -18,18 +18,49 @@ import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class ApiClient {
+public class ApiClient implements Callable<ThreadRecord> {
 
   private ThreadInput threadInput;
   private String apiRoute;
+  private TextLine body;
+  private String function;
+
 
 //  private final static String API_PATH = "/textbody/";
 
   private final OkHttpClient client = new OkHttpClient();
 
-  public ApiClient(ThreadInput threadInput, String apiRoute) {
+  public ApiClient(ThreadInput threadInput, TextLine body, String function) {
     this.threadInput = threadInput;
-    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();
+    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();;
+    this.body = body;
+    this.function = function;
+  }
+
+  @Override
+  public ThreadRecord call() throws ApiException {
+    // verify the required parameter 'body' is set
+    if (this.body == null) {
+      throw new ApiException("Missing the required parameter 'body'");
+    }
+    // verify the required parameter 'function' is set
+    if (this.function == null) {
+      throw new ApiException("Missing the required parameter 'function'");
+    }
+
+    int totalSuccessCall = 0, totalFailedCall = 0;
+    Object localVarPostBody = this.body;
+
+    // create path and map variables
+    final String localVarPath = "/textbody/" + this.function + "/";
+    final String localVarContentType = "application/json; charset=utf-8";
+
+    if (postRequest(localVarPath, localVarPostBody, localVarContentType)) {
+      totalSuccessCall++;
+    } else {
+      totalFailedCall++;
+    }
+    return new ThreadRecord(totalSuccessCall, totalFailedCall);
   }
 
   public boolean postRequest(String path, Object postBody, String contentType)
