@@ -1,140 +1,98 @@
 package neu.cs6650.client;
 
-import com.google.gson.Gson;
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import neu.cs6650.api.ApiException;
-import neu.cs6650.api.ApiResponse;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
-import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ApiClient implements Callable<ThreadRecord> {
 
+  private static final Logger logger = LogManager.getLogger(ApiClient.class.getName());
+
+  private BlockingQueue<String> lineQueue;
   private ThreadInput threadInput;
   private String apiRoute;
-//  private String body;
   private String function;
-  private BlockingQueue<String> lineQueue;
+  private String poisonPill;
 
-//  private final static String API_PATH = "/textbody/";
+  private final static String WEB_APP = "text_servlet";
+  private final static String API_PATH = "textbody";
+  private final static String CONTENT_TYPE = "application/json; charset=utf-8";
+
 
   private final OkHttpClient client = new OkHttpClient();
 
-  public ApiClient(ThreadInput threadInput, String function, BlockingQueue<String> lineQueue) {
-    this.threadInput = threadInput;
-    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort() + "/text_servlet";
-//    this.body = body;
-    this.function = function;
+  public ApiClient(BlockingQueue<String> lineQueue, ThreadInput threadInput, String function,
+      String poisonPill) {
     this.lineQueue = lineQueue;
+    this.threadInput = threadInput;
+    this.apiRoute =
+        "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort() + "/"
+            + WEB_APP;
+    this.function = function;
+    this.poisonPill = poisonPill;
   }
 
   @Override
-  public ThreadRecord call() throws ApiException {
-    // verify the required parameter 'body' is set
-//    if (this.body == null) {
-//      throw new ApiException("Missing the required parameter 'body'");
-//    }
-    // verify the required parameter 'function' is set
-    if (this.function == null) {
-      throw new ApiException("Missing the required parameter 'function'");
-    }
-
+  public ThreadRecord call() {
     int totalSuccessCall = 0, totalFailedCall = 0;
     String localVarPostBody = null;
 
     // create path and map variables
-    final String localVarPath = "/textbody/" + this.function + "/";
-    final String localVarContentType = "application/json; charset=utf-8";
+    final String localVarPath = "/" + API_PATH + "/" + this.function + "/";
 
     while (true) {
       try {
         localVarPostBody = this.lineQueue.take();
-        if (localVarPostBody.equals("-1 poison pill")) {
-//          return new ThreadRecord(totalSuccessCall, totalFailedCall);
+        if (localVarPostBody.equals(this.poisonPill)) {
           break;
         } else {
-          if (postRequest(localVarPath, localVarPostBody, localVarContentType)) {
+          if (postRequest(localVarPath, localVarPostBody, CONTENT_TYPE)) {
             totalSuccessCall++;
           } else {
             totalFailedCall++;
           }
         }
-        System.out.println("c: " + localVarPostBody);
       } catch (InterruptedException e) {
-        System.out.println("Consumer Interrupted");
-//        Thread.currentThread().interrupt();
-        e.printStackTrace();
+        logger.error("Thread interrupted");
+        Thread.currentThread().interrupt();
       }
     }
     return new ThreadRecord(totalSuccessCall, totalFailedCall);
   }
 
-  public boolean postRequest(String path, Object postBody, String contentType)
-      throws ApiException {
+  public boolean postRequest(String path, String postBody, String contentType) {
     Request request = buildPostCall(path, postBody, contentType);
-//    long startTime = System.currentTimeMillis();
     try (Response response = client.newCall(request).execute()) {
-      if (response.code() == 200) {
-        return true;
-      } else {
-//      System.out.println(response.code());
-        return false;
-      }
+      return response.code() == 200;
     } catch (IOException e) {
-//      e.printStackTrace();
+      logger.info(e.getMessage());
       return false;
     }
-
   }
 
-  private Request buildPostCall(String path, Object postBody, String contentType)
-      throws ApiException {
-    final String url = buildUrl(path);
-    final RequestBody reqBody;
-
-    if (isJsonMime(contentType)) {
-      String json = postBody.toString();
-      reqBody = RequestBody.create(json, MediaType.parse(contentType));
-    } else {
-      throw new ApiException("Content type \"" + contentType + "\" is not supported");
-    }
-
-    final Request reqBuilder = new Builder()
+  private Request buildPostCall(String path, String postBody, String contentType) {
+    String url = buildUrl(path);
+    RequestBody reqBody = RequestBody.create(postBody, MediaType.parse(contentType));
+    return new Builder()
         .url(url)
         .post(reqBody)
         .build();
-
-    return reqBuilder;
   }
 
   private String buildUrl(String path) {
     return this.apiRoute + path;
-  }
-
-  /**
-   * Check if the given MIME is a JSON MIME.
-   * JSON MIME examples:
-   *   application/json
-   *   application/json; charset=UTF8
-   *   APPLICATION/JSON
-   *   application/vnd.company+json
-   * "* / *" is also default to JSON
-   * @param mime MIME (Multipurpose Internet Mail Extensions)
-   * @return True if the given MIME is JSON, false otherwise.
-   */
-  public boolean isJsonMime(String mime) {
-    String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
-    return mime != null && (mime.matches(jsonMime) || mime.equals("*/*"));
   }
 
 }
