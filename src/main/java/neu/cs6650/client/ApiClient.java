@@ -32,7 +32,7 @@ public class ApiClient implements Callable<ThreadRecord> {
 
   public ApiClient(ThreadInput threadInput, String function, BlockingQueue<String> lineQueue) {
     this.threadInput = threadInput;
-    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();;
+    this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort() + "/text_servlet";
 //    this.body = body;
     this.function = function;
     this.lineQueue = lineQueue;
@@ -69,7 +69,6 @@ public class ApiClient implements Callable<ThreadRecord> {
             totalFailedCall++;
           }
         }
-        totalSuccessCall++;
         System.out.println("c: " + localVarPostBody);
       } catch (InterruptedException e) {
         System.out.println("Consumer Interrupted");
