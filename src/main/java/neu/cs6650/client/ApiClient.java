@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import neu.cs6650.api.ApiException;
 import neu.cs6650.api.ApiResponse;
-import neu.cs6650.model.TextLine;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import okhttp3.Call;
@@ -22,43 +22,60 @@ public class ApiClient implements Callable<ThreadRecord> {
 
   private ThreadInput threadInput;
   private String apiRoute;
-  private TextLine body;
+//  private String body;
   private String function;
-
+  private BlockingQueue<String> lineQueue;
 
 //  private final static String API_PATH = "/textbody/";
 
   private final OkHttpClient client = new OkHttpClient();
 
-  public ApiClient(ThreadInput threadInput, TextLine body, String function) {
+  public ApiClient(ThreadInput threadInput, String function, BlockingQueue<String> lineQueue) {
     this.threadInput = threadInput;
     this.apiRoute = "http://" + this.threadInput.getIpAddress() + ":" + this.threadInput.getPort();;
-    this.body = body;
+//    this.body = body;
     this.function = function;
+    this.lineQueue = lineQueue;
   }
 
   @Override
   public ThreadRecord call() throws ApiException {
     // verify the required parameter 'body' is set
-    if (this.body == null) {
-      throw new ApiException("Missing the required parameter 'body'");
-    }
+//    if (this.body == null) {
+//      throw new ApiException("Missing the required parameter 'body'");
+//    }
     // verify the required parameter 'function' is set
     if (this.function == null) {
       throw new ApiException("Missing the required parameter 'function'");
     }
 
     int totalSuccessCall = 0, totalFailedCall = 0;
-    Object localVarPostBody = this.body;
+    String localVarPostBody = null;
 
     // create path and map variables
     final String localVarPath = "/textbody/" + this.function + "/";
     final String localVarContentType = "application/json; charset=utf-8";
 
-    if (postRequest(localVarPath, localVarPostBody, localVarContentType)) {
-      totalSuccessCall++;
-    } else {
-      totalFailedCall++;
+    while (true) {
+      try {
+        localVarPostBody = this.lineQueue.take();
+        if (localVarPostBody.equals("-1 poison pill")) {
+//          return new ThreadRecord(totalSuccessCall, totalFailedCall);
+          break;
+        } else {
+          if (postRequest(localVarPath, localVarPostBody, localVarContentType)) {
+            totalSuccessCall++;
+          } else {
+            totalFailedCall++;
+          }
+        }
+        totalSuccessCall++;
+        System.out.println("c: " + localVarPostBody);
+      } catch (InterruptedException e) {
+        System.out.println("Consumer Interrupted");
+//        Thread.currentThread().interrupt();
+        e.printStackTrace();
+      }
     }
     return new ThreadRecord(totalSuccessCall, totalFailedCall);
   }
