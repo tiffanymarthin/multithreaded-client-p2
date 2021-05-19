@@ -10,14 +10,16 @@ public class InputProcessor implements Runnable {
 //TODO Add logging and modify exceptions
   private BlockingQueue<String> lineQueue;
   private transient BufferedReader bufferedReader;
+  private int consumerMaxThread;
 
-  public InputProcessor(String inputFile, BlockingQueue<String> lineQueue) {
+  public InputProcessor(String inputFile, BlockingQueue<String> lineQueue, int consumerMaxThread) {
     this.lineQueue = lineQueue;
     try {
         bufferedReader = new BufferedReader(new FileReader(inputFile));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+    this.consumerMaxThread = consumerMaxThread;
   }
 
   @Override
@@ -28,7 +30,7 @@ public class InputProcessor implements Runnable {
         lineQueue.put(line);
         System.out.println("p: " + line);
       }
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < this.consumerMaxThread; i++) {
         lineQueue.put("-1 poison pill");
       }
     } catch (IOException e) {
