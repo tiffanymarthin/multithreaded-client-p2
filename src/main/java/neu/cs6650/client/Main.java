@@ -16,12 +16,13 @@ public class Main {
     // Process Statistics
     BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(5);
     String inputFile = "input/test.txt";
+//    String inputFile = "input/bsds-summer-2021-testdata.txt";
     String eof = "-1";
 
     String ipAdd = "localhost";
     String port = "8080";
     String funct = "wordcount";
-    int maxThread = 100;
+    int maxThread = 3;
 
     // One thread to read the input file
     InputProcessor inputProcessor = new InputProcessor(inputFile, blockingQueue, maxThread);
