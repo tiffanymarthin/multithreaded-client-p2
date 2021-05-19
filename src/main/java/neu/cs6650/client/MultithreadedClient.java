@@ -23,9 +23,8 @@ public class MultithreadedClient {
   private long totalSuccessfulRequests;
   private long totalFailedRequests;
 
-  private ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
-  private CompletionService<ThreadRecord> completionService = new ExecutorCompletionService<>(
-      executor);
+  private ExecutorService executor;
+  private CompletionService<ThreadRecord> completionService;
 
   public MultithreadedClient(Integer maxThreads,
       BlockingQueue<String> textInput, String ipAddress, String port, String function) {
@@ -34,6 +33,8 @@ public class MultithreadedClient {
     this.ipAddress = ipAddress;
     this.port = port;
     this.function = function;
+    this.executor = Executors.newFixedThreadPool(maxThreads);
+    this.completionService = new ExecutorCompletionService<>(this.executor);
   }
 
   public void start() throws InterruptedException {
@@ -63,6 +64,14 @@ public class MultithreadedClient {
     } catch (ExecutionException | CancellationException e) {
       System.out.println("ee or cancel e");
     }
+  }
+
+  public long getTotalSuccessfulRequests() {
+    return totalSuccessfulRequests;
+  }
+
+  public long getTotalFailedRequests() {
+    return totalFailedRequests;
   }
 }
 
