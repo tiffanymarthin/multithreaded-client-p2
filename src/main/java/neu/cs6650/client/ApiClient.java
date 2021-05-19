@@ -84,7 +84,12 @@ public class ApiClient implements Callable<ThreadRecord> {
     Request request = buildPostCall(path, postBody, contentType);
 //    long startTime = System.currentTimeMillis();
     try (Response response = client.newCall(request).execute()) {
-      return true;
+      if (response.code() == 200) {
+        return true;
+      } else {
+//      System.out.println(response.code());
+        return false;
+      }
     } catch (IOException e) {
 //      e.printStackTrace();
       return false;
