@@ -27,6 +27,7 @@ public class InputProcessor implements Runnable {
     String line = null;
     try {
       while ((line = bufferedReader.readLine()) != null) {
+        if (line.length() == 0) continue;
         lineQueue.put(line);
         System.out.println("p: " + line);
       }
