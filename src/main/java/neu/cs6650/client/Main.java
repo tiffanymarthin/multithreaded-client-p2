@@ -1,7 +1,6 @@
 package neu.cs6650.client;
 
 import java.io.IOException;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import neu.cs6650.Configuration;
@@ -28,7 +27,7 @@ public class Main {
     String port = "8080";
     String function = "wordcount";
 
-    int maxThread = 256;
+    int maxThread = 32;
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 
     long startTime, endTime;

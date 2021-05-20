@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import javax.sql.rowset.serial.SerialStruct;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import org.apache.logging.log4j.LogManager;
@@ -49,8 +48,7 @@ public class MultithreadedClient {
   public void start() throws InterruptedException {
     submitThreads();
     updateRequestResults();
-    executor.shutdown();
-    executor.awaitTermination(2, TimeUnit.MINUTES);
+    shutdownExecutor();
   }
 
   private void submitThreads() {
@@ -75,6 +73,23 @@ public class MultithreadedClient {
       Thread.currentThread().interrupt();
     } catch (ExecutionException | CancellationException e) {
       logger.info(e.getMessage());
+    }
+  }
+
+  private void shutdownExecutor() {
+    try {
+      int tries = 0;
+      executor.shutdown();
+      while (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+        executor.shutdownNow();
+        if (++tries > 3) {
+          logger.fatal("Unable to shutdown thread executor. Calling System.exit()...");
+          System.exit(0);
+        }
+      }
+    } catch (InterruptedException e) {
+      executor.shutdownNow();
+      Thread.currentThread().interrupt();
     }
   }
 
