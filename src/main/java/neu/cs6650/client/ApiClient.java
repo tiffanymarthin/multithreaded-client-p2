@@ -24,7 +24,7 @@ public class ApiClient implements Callable<ThreadRecord> {
   private String function;
   private String poisonPill;
 
-  private final static String WEB_APP = "text_servlet";
+  private final static String WEB_APP = "java-servlet";
   private final static String API_PATH = "textbody";
   private final static String CONTENT_TYPE = "application/json; charset=utf-8";
 
@@ -63,7 +63,7 @@ public class ApiClient implements Callable<ThreadRecord> {
           }
         }
       } catch (InterruptedException e) {
-        logger.error("Thread interrupted");
+        logger.info("Thread interrupted");
         Thread.currentThread().interrupt();
       }
     }
@@ -72,6 +72,7 @@ public class ApiClient implements Callable<ThreadRecord> {
 
   public boolean postRequest(String path, String postBody, String contentType) {
     Request request = buildPostCall(path, postBody, contentType);
+//    System.out.println(Thread.currentThread());
     try (Response response = client.newCall(request).execute()) {
       return response.code() == 200;
     } catch (IOException e) {

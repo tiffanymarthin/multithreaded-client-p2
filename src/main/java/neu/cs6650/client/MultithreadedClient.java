@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import javax.sql.rowset.serial.SerialStruct;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +32,8 @@ public class MultithreadedClient {
   private ExecutorService executor;
   private CompletionService<ThreadRecord> completionService;
 
+  private long endTime;
+
   public MultithreadedClient(Integer maxThreads,
       BlockingQueue<String> textInput, String ipAddress, String port, String function, String poisonPill) {
     this.maxThreads = maxThreads;
@@ -46,10 +50,12 @@ public class MultithreadedClient {
     submitThreads();
     updateRequestResults();
     executor.shutdown();
+    executor.awaitTermination(2, TimeUnit.MINUTES);
   }
 
   private void submitThreads() {
     ThreadInput threadInput = new ThreadInput(this.ipAddress, this.port);
+    //TODO check here, create new apiClient
     ApiClient apiClient = new ApiClient(lineQueue, threadInput, function, poisonPill);
     for (int i = 0; i < maxThreads; i++) {
       completionService.submit(apiClient);
@@ -65,10 +71,10 @@ public class MultithreadedClient {
         totalFailedRequests += record.getNFailedRequest();
       }
     } catch (InterruptedException e) {
-      logger.error("Thread interrupted");
+      logger.info("Thread interrupted");
       Thread.currentThread().interrupt();
     } catch (ExecutionException | CancellationException e) {
-      logger.error(e.getMessage());
+      logger.info(e.getMessage());
     }
   }
 
@@ -78,6 +84,10 @@ public class MultithreadedClient {
 
   public long getTotalFailedRequests() {
     return totalFailedRequests;
+  }
+
+  public long getEndTime() {
+    return endTime;
   }
 }
 

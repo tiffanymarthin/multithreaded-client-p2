@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,11 +20,19 @@ public class InputProcessor implements Runnable {
 
   public InputProcessor(String inputFile, BlockingQueue<String> lineQueue, int consumerMaxThread, String poisonPill) {
     this.lineQueue = lineQueue;
-    try {
-        bufferedReader = new BufferedReader(new FileReader(inputFile));
-    } catch (FileNotFoundException e) {
-      logger.fatal(e.getMessage());
-    }
+//    try {
+//        bufferedReader = new BufferedReader(new FileReader(inputFile));
+        try {
+          InputStream inputStream = this.getClass().getResourceAsStream("/" + inputFile);
+          InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+          bufferedReader = new BufferedReader(inputStreamReader);
+        }
+        catch (NullPointerException e) {
+          logger.info("File not found");
+        };
+//    } catch (FileNotFoundException e) {
+//      logger.fatal(e.getMessage());
+//    }
     this.consumerMaxThread = consumerMaxThread;
     this.poisonPill = poisonPill;
   }
@@ -40,9 +50,9 @@ public class InputProcessor implements Runnable {
       }
       logger.info("*********** File Processing Ends ***********");
     } catch (IOException e) {
-      logger.error(e.getMessage());
+      logger.info(e.getMessage());
     } catch (InterruptedException e) {
-      logger.error("Thread interrupted");
+      logger.info("Thread interrupted");
       Thread.currentThread().interrupt();
     }
   }

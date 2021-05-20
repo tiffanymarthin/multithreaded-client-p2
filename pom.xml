@@ -7,10 +7,11 @@
   <groupId>neu.cs6650</groupId>
   <artifactId>multithreaded-client-p1</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <name>multithreaded-client-p1</name>
   <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+<!--  <url>http://www.example.com</url>-->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -94,6 +95,33 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <archive>
+                  <manifest>
+                    <mainClass>
+                      neu.cs6650.client.Main
+                    </mainClass>
+                  </manifest>
+                  <manifestEntries>
+                    <Multi-Release>true</Multi-Release>
+                  </manifestEntries>
+                </archive>
+                <descriptorRefs>
+                  <descriptorRef>multithreaded-client1-jar</descriptorRef>
+                </descriptorRefs>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
