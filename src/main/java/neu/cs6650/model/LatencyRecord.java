@@ -28,4 +28,14 @@ public class LatencyRecord {
   public int getResponseCode() {
     return responseCode;
   }
+
+  @Override
+  public String toString() {
+    return "LatencyRecord{" +
+        "startTime=" + startTime +
+        ", requestType='" + requestType + '\'' +
+        ", latency=" + latency +
+        ", responseCode=" + responseCode +
+        '}';
+  }
 }
