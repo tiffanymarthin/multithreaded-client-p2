@@ -1,6 +1,8 @@
 package neu.cs6650.client;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionService;
@@ -29,12 +31,10 @@ public class MultithreadedClient {
 
   private long totalSuccessfulRequests;
   private long totalFailedRequests;
-  private LinkedList<LatencyRecord> latencyList;
+  private List<LatencyRecord> latencyList = new ArrayList<>();
 
   private ExecutorService executor;
   private CompletionService<ThreadRecord> completionService;
-
-  private long endTime;
 
   public MultithreadedClient(Integer maxThreads,
       BlockingQueue<String> textInput, String ipAddress, String port, String function, String poisonPill) {
@@ -46,7 +46,6 @@ public class MultithreadedClient {
     this.poisonPill = poisonPill;
     this.executor = Executors.newFixedThreadPool(maxThreads);
     this.completionService = new ExecutorCompletionService<>(this.executor);
-    this.latencyList = new LinkedList<>();
   }
 
   public void start() throws InterruptedException {
@@ -57,9 +56,9 @@ public class MultithreadedClient {
 
   private void submitThreads() {
     ThreadInput threadInput = new ThreadInput(this.ipAddress, this.port);
-    ApiClient apiClient = new ApiClient(lineQueue, threadInput, function, poisonPill);
     for (int i = 0; i < maxThreads; i++) {
-      System.out.println("submit Thread");
+      ApiClient apiClient = new ApiClient(lineQueue, threadInput, function, poisonPill);
+      //      System.out.println("submit Thread");
       completionService.submit(apiClient);
     }
   }
@@ -69,10 +68,10 @@ public class MultithreadedClient {
       for (int i = 0; i < this.maxThreads; i++) {
         Future<ThreadRecord> f = completionService.take();
         ThreadRecord record = f.get();
-        System.out.println("future get: " + Thread.currentThread().getId());
+//        System.out.println("future get: " + Thread.currentThread().getId());
         this.totalSuccessfulRequests += record.getNSuccessRequest();
         this.totalFailedRequests += record.getNFailedRequest();
-        this.latencyList.addAll(record.getLatencyList());
+        latencyList.addAll(record.getLatencyList());
       }
     } catch (InterruptedException e) {
       logger.info("Thread interrupted");
@@ -107,7 +106,7 @@ public class MultithreadedClient {
     return totalFailedRequests;
   }
 
-  public LinkedList<LatencyRecord> getLatencyList() {
+  public List<LatencyRecord> getLatencyList() {
     return latencyList;
   }
 }

@@ -23,16 +23,24 @@ public class InputProcessor implements Runnable {
     this.lineQueue = lineQueue;
 //    try {
 //        bufferedReader = new BufferedReader(new FileReader(inputFile));
-        try (InputStream inputStream = this.getClass().getResourceAsStream("/" + inputFile)) {
-          InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-          bufferedReader = new BufferedReader(inputStreamReader);
-        }
-        catch (NullPointerException | IOException e) {
-          logger.info("File not found");
-        };
+//    try (InputStream inputStream = this.getClass().getResourceAsStream("/" + inputFile)) {
+//      InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+//      bufferedReader = new BufferedReader(inputStreamReader);
+//    }
+//    catch (NullPointerException | IOException e) {
+//      logger.info("File not found");
+//    };
 //    } catch (FileNotFoundException e) {
 //      logger.fatal(e.getMessage());
 //    }
+    try {
+      InputStream inputStream = this.getClass().getResourceAsStream("/" + inputFile);
+      InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+      bufferedReader = new BufferedReader(inputStreamReader);
+    }
+    catch (NullPointerException e) {
+      logger.info("File not found");
+    };
     this.consumerMaxThread = consumerMaxThread;
     this.poisonPill = poisonPill;
   }
