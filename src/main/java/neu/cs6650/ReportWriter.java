@@ -4,18 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.List;
 import neu.cs6650.model.LatencyRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ReportWriter {
-  private static final Logger logger = LogManager.getLogger(InputProcessor.class.getName());
+  private static final Logger logger = LogManager.getLogger(ReportWriter.class.getName());
 
   private String csvOutputFile;
-  private LinkedList<LatencyRecord> latencyList;
+  private List<LatencyRecord> latencyList;
 
-  public ReportWriter(String csvOutputFile,
-      LinkedList<LatencyRecord> latencyList) {
+  public ReportWriter(String csvOutputFile, List<LatencyRecord> latencyList) {
     this.csvOutputFile = csvOutputFile;
     this.latencyList = latencyList;
   }
