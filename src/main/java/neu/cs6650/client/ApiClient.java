@@ -1,8 +1,12 @@
 package neu.cs6650.client;
 
+import com.sun.tools.javac.util.List;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import neu.cs6650.model.LatencyRecord;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
 import okhttp3.MediaType;
@@ -23,6 +27,7 @@ public class ApiClient implements Callable<ThreadRecord> {
   private String apiRoute;
   private String function;
   private String poisonPill;
+  private LinkedList<LatencyRecord> latencyList;
 
   private final static String WEB_APP = "java-servlet";
   private final static String API_PATH = "textbody";
@@ -40,6 +45,7 @@ public class ApiClient implements Callable<ThreadRecord> {
             + WEB_APP;
     this.function = function;
     this.poisonPill = poisonPill;
+    this.latencyList = new LinkedList<>();
   }
 
   @Override
@@ -53,8 +59,9 @@ public class ApiClient implements Callable<ThreadRecord> {
     while (true) {
       try {
         localVarPostBody = this.lineQueue.take();
+        System.out.println("c: " + localVarPostBody);
         if (localVarPostBody.equals(this.poisonPill)) {
-          break;
+          return new ThreadRecord(totalSuccessCall, totalFailedCall);
         } else {
           if (postRequest(localVarPath, localVarPostBody, CONTENT_TYPE)) {
             totalSuccessCall++;
@@ -67,13 +74,16 @@ public class ApiClient implements Callable<ThreadRecord> {
         Thread.currentThread().interrupt();
       }
     }
-    return new ThreadRecord(totalSuccessCall, totalFailedCall);
+//    return new ThreadRecord(totalSuccessCall, totalFailedCall);
   }
 
   public boolean postRequest(String path, String postBody, String contentType) {
+    long startTime, endTime;
+    startTime = System.currentTimeMillis();
     Request request = buildPostCall(path, postBody, contentType);
-//    System.out.println(Thread.currentThread());
     try (Response response = client.newCall(request).execute()) {
+      endTime = System.currentTimeMillis();
+      latencyList.add(new LatencyRecord(startTime, "POST", endTime - startTime, response.code()));
       return response.code() == 200;
     } catch (IOException e) {
       logger.info(e.getMessage());
