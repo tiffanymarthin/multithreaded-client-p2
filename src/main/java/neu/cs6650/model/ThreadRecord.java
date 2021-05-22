@@ -1,5 +1,6 @@
 package neu.cs6650.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ThreadRecord {
@@ -7,9 +8,10 @@ public class ThreadRecord {
   private int nFailedRequest;
   private List<LatencyRecord> latencyList;
 
-  public ThreadRecord(int nSuccessRequest, int nFailedRequest) {
+  public ThreadRecord(int nSuccessRequest, int nFailedRequest, List<LatencyRecord> latencyList) {
     this.nSuccessRequest = nSuccessRequest;
     this.nFailedRequest = nFailedRequest;
+    this.latencyList = latencyList;
   }
 
   public int getNSuccessRequest() {

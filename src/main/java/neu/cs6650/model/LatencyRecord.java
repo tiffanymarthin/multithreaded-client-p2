@@ -31,11 +31,9 @@ public class LatencyRecord {
 
   @Override
   public String toString() {
-    return "LatencyRecord{" +
-        "startTime=" + startTime +
-        ", requestType='" + requestType + '\'' +
-        ", latency=" + latency +
-        ", responseCode=" + responseCode +
-        '}';
+    return startTime +
+        ", " + requestType +
+        ", " + latency +
+        ", " + responseCode;
   }
 }
