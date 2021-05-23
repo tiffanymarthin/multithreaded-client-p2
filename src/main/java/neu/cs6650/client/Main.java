@@ -13,9 +13,9 @@ public class Main {
   private static final Logger logger = LogManager.getLogger(Main.class.getName());
 //  private static final String INPUT_PATH = "test.txt";
   private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
-  private static final String OUTPUT_PATH = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/latencyOutput.csv";
+  private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/latencyOutput.csv";
   private static final String POISON_PILL = "-1";
-  private static final String AWS_API_ROUTE = "ec2-3-84-197-20.compute-1.amazonaws.com";
+  private static final String AWS_API_ROUTE = "ec2-18-208-225-119.compute-1.amazonaws.com";
 
   public static void main(String[] args) throws IOException, InterruptedException {
     // Create a BlockingQ
@@ -29,7 +29,7 @@ public class Main {
     String port = "8080";
     String function = "wordcount";
 
-    int maxThread = 64;
+    int maxThread = 256;
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 //    BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1000);
 
@@ -42,6 +42,7 @@ public class Main {
       port = args[1];
       function = args[2];
       maxThread = Integer.parseInt(args[3]);
+      outputPath = args[4];
     }
 
     logger.info("*********** Parameters ***********");
@@ -67,7 +68,7 @@ public class Main {
     logger.info("Throughput (requests/second): " + (Util.requestsPerSecond((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()), (endTime - startTime))) + "\n");
 
 //    logger.info("*********** Write CSV Output for Latency Records ***********");
-    ReportWriter reportWriter = new ReportWriter(OUTPUT_PATH, client.getLatencyList());
+    ReportWriter reportWriter = new ReportWriter(outputPath, client.getLatencyList());
     reportWriter.start();
 //    logger.info("*********** CSV Writer Output for Latency Records ***********");
 
