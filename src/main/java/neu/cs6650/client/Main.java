@@ -29,7 +29,7 @@ public class Main {
     String port = "8080";
     String function = "wordcount";
 
-    int maxThread = 128;
+    int maxThread = 64;
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 //    BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1000);
 
@@ -64,7 +64,7 @@ public class Main {
     logger.info("Number of failed requests: " + client.getTotalFailedRequests());
     logger.info("Client run time: " + (endTime - startTime) + " milliseconds");
 //    logger.info("Throughput (requests/second): " + ((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()) * 1000 / (endTime - startTime)));
-    logger.info("Throughput (requests/second): " + (Util.requestsPerSecond((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()), (endTime - startTime))));
+    logger.info("Throughput (requests/second): " + (Util.requestsPerSecond((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()), (endTime - startTime))) + "\n");
 
 //    logger.info("*********** Write CSV Output for Latency Records ***********");
     ReportWriter reportWriter = new ReportWriter(OUTPUT_PATH, client.getLatencyList());
