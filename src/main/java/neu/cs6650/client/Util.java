@@ -41,4 +41,18 @@ public class Util {
         .max()
         .orElseThrow(NoSuchElementException::new);
   }
+
+  public static double p25ResponseTime(List<LatencyRecord> latencyList) {
+    Percentile p25 = new Percentile();
+    DoubleStream sortedLatencies = latencyList.stream().mapToDouble(LatencyRecord::getLatency).sorted();
+
+    return p25.evaluate(sortedLatencies.toArray(), 25);
+  }
+
+  public static double p75ResponseTime(List<LatencyRecord> latencyList) {
+    Percentile p75 = new Percentile();
+    DoubleStream sortedLatencies = latencyList.stream().mapToDouble(LatencyRecord::getLatency).sorted();
+
+    return p75.evaluate(sortedLatencies.toArray(), 75);
+  }
 }

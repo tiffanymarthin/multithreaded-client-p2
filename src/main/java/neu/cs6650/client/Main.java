@@ -76,6 +76,8 @@ public class Main {
     logger.info("*********** Thread Aggregate Statistics ***********");
     logger.info("Mean response time for POSTs (milliseconds): " + Util.meanResponseTime(client.getLatencyList()));
     logger.info("Median response time for POSTs (milliseconds): " + Util.medianResponseTime(client.getLatencyList()));
+    logger.info("25th percentile response time for POSTs (milliseconds): " + Util.p25ResponseTime(client.getLatencyList()));
+    logger.info("75th percentile response time for POSTs (milliseconds): " + Util.p75ResponseTime(client.getLatencyList()));
     logger.info("99th percentile response time for POSTs (milliseconds): " + Util.p99ResponseTime(client.getLatencyList()));
     logger.info("Max response time for POSTs (milliseconds): " + Util.maxResponseTime(client.getLatencyList()));
   }
