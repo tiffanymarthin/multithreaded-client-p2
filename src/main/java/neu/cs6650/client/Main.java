@@ -15,7 +15,7 @@ public class Main {
   private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
   private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/latencyOutput.csv";
   private static final String POISON_PILL = "-1";
-  private static final String AWS_API_ROUTE = "ec2-18-208-225-119.compute-1.amazonaws.com";
+  private static final String AWS_API_ROUTE = "ec2-3-237-4-88.compute-1.amazonaws.com";
 
   public static void main(String[] args) throws IOException, InterruptedException {
     // Create a BlockingQ
@@ -29,7 +29,7 @@ public class Main {
     String port = "8080";
     String function = "wordcount";
 
-    int maxThread = 256;
+    int maxThread = 32;
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 //    BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1000);
 
@@ -72,7 +72,7 @@ public class Main {
     reportWriter.start();
 //    logger.info("*********** CSV Writer Output for Latency Records ***********");
 
-
+    logger.info("Num of cores: " + Runtime.getRuntime().availableProcessors());
     logger.info("*********** Thread Aggregate Statistics ***********");
     logger.info("Mean response time for POSTs (milliseconds): " + Util.meanResponseTime(client.getLatencyList()));
     logger.info("Median response time for POSTs (milliseconds): " + Util.medianResponseTime(client.getLatencyList()));

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import neu.cs6650.model.LatencyRecord;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
@@ -17,12 +18,11 @@ import okhttp3.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ApiClient implements Callable<ThreadRecord> {
+public class PostCallable implements Callable<ThreadRecord> {
 
-  private static final Logger logger = LogManager.getLogger(ApiClient.class.getName());
+  private static final Logger logger = LogManager.getLogger(PostCallable.class.getName());
 
   private BlockingQueue<String> lineQueue;
-//  private BlockingQueue<LatencyRecord> latencyRecordsQueue;
   private ThreadInput threadInput;
   private String apiRoute;
   private String function;
@@ -34,9 +34,12 @@ public class ApiClient implements Callable<ThreadRecord> {
   private final static String CONTENT_TYPE = "application/json; charset=utf-8";
 
 
-  private final OkHttpClient client = new OkHttpClient();
+  private final OkHttpClient client = new OkHttpClient.Builder()
+      .connectTimeout(3, TimeUnit.SECONDS)
+      .readTimeout(3, TimeUnit.SECONDS)
+      .build();
 
-  public ApiClient(BlockingQueue<String> lineQueue, ThreadInput threadInput, String function,
+  public PostCallable(BlockingQueue<String> lineQueue, ThreadInput threadInput, String function,
       String poisonPill) {
     this.lineQueue = lineQueue;
     this.threadInput = threadInput;
@@ -85,7 +88,6 @@ public class ApiClient implements Callable<ThreadRecord> {
       endTime = System.currentTimeMillis();
       LatencyRecord latencyRecord = new LatencyRecord(startTime, "POST", endTime - startTime, response.code());
       latencyList.add(latencyRecord);
-//      latencyRecordsQueue.put(latencyRecord);
       return response.code() == 200;
     } catch (IOException e) {
       logger.info(e.getMessage());

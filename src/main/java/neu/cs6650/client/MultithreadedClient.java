@@ -1,7 +1,6 @@
 package neu.cs6650.client;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
@@ -19,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class MultithreadedClient {
-  private static final Logger logger = LogManager.getLogger(ApiClient.class.getName());
+  private static final Logger logger = LogManager.getLogger(PostCallable.class.getName());
 
   private Integer maxThreads;
   private BlockingQueue<String> lineQueue;
@@ -57,15 +56,14 @@ public class MultithreadedClient {
   private void submitThreads() {
     ThreadInput threadInput = new ThreadInput(this.ipAddress, this.port);
     for (int i = 0; i < maxThreads; i++) {
-      ApiClient apiClient = new ApiClient(lineQueue, threadInput, function, poisonPill);
-      //      System.out.println("submit Thread");
-      completionService.submit(apiClient);
+      PostCallable postCallable = new PostCallable(lineQueue, threadInput, function, poisonPill);
+      completionService.submit(postCallable);
     }
   }
 
   private void updateRequestResults() {
     try {
-      for (int i = 0; i < this.maxThreads; i++) {
+      for (int i = 0; i < maxThreads; i++) {
         Future<ThreadRecord> f = completionService.take();
         ThreadRecord record = f.get();
 //        System.out.println("future get: " + Thread.currentThread().getId());
