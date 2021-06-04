@@ -13,9 +13,9 @@ public class Main {
   private static final Logger logger = LogManager.getLogger(Main.class.getName());
 //  private static final String INPUT_PATH = "test.txt";
   private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
-  private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/latencyOutput.csv";
+  private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/sample.csv";
   private static final String POISON_PILL = "-1";
-  private static final String AWS_API_ROUTE = "ec2-3-237-4-88.compute-1.amazonaws.com";
+  private static final String AWS_API_ROUTE = "ec2-34-204-15-238.compute-1.amazonaws.com";
 
   public static void main(String[] args) throws IOException, InterruptedException {
     // Create a BlockingQ
@@ -29,7 +29,7 @@ public class Main {
     String port = "8080";
     String function = "wordcount";
 
-    int maxThread = 32;
+    int maxThread = 64;
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
 //    BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1000);
 

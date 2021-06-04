@@ -29,7 +29,8 @@ public class PostCallable implements Callable<ThreadRecord> {
   private String poisonPill;
   private List<LatencyRecord> latencyList;
 
-  private final static String WEB_APP = "java-servlet";
+//  private final static String WEB_APP = "java-servlet";
+  private final static String WEB_APP = "java_servlet_rmq";
   private final static String API_PATH = "textbody";
   private final static String CONTENT_TYPE = "application/json; charset=utf-8";
 
@@ -82,8 +83,9 @@ public class PostCallable implements Callable<ThreadRecord> {
 
   public boolean postRequest(String path, String postBody, String contentType) {
     long startTime, endTime;
-    startTime = System.currentTimeMillis();
+//    startTime = System.currentTimeMillis();
     Request request = buildPostCall(path, postBody, contentType);
+    startTime = System.currentTimeMillis();
     try (Response response = client.newCall(request).execute()) {
       endTime = System.currentTimeMillis();
       LatencyRecord latencyRecord = new LatencyRecord(startTime, "POST", endTime - startTime, response.code());
