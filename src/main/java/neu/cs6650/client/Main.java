@@ -12,10 +12,12 @@ import org.apache.logging.log4j.Logger;
 public class Main {
   private static final Logger logger = LogManager.getLogger(Main.class.getName());
 //  private static final String INPUT_PATH = "test.txt";
-  private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
+//  private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
+  private static final String INPUT_PATH = "bsds-summer-2021-testdata-assignment2.txt";
   private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/sample.csv";
   private static final String POISON_PILL = "-1";
-  private static final String AWS_API_ROUTE = "ec2-34-204-15-238.compute-1.amazonaws.com";
+  private static final String AWS_API_ROUTE = "34.215.200.33";
+  private static String AWS_LB = "a2-loadbalancer-server-e39e39be22214364.elb.us-west-2.amazonaws.com";
 
   public static void main(String[] args) throws IOException, InterruptedException {
     // Create a BlockingQ
@@ -25,7 +27,7 @@ public class Main {
     // Write to CSV
     // Process Statistics
 
-    String ipAddress = Configuration.IS_LOCAL ? "localhost" : AWS_API_ROUTE;
+    String ipAddress = Configuration.IS_LOCAL ? "localhost" : (Configuration.IS_LB ? AWS_LB : AWS_API_ROUTE);
     String port = "8080";
     String function = "wordcount";
 
@@ -38,11 +40,10 @@ public class Main {
     // Command line arguments for easier tests
     //TODO validates the inputs
     if (args.length != 0) {
-      ipAddress = args[0];
-      port = args[1];
-      function = args[2];
-      maxThread = Integer.parseInt(args[3]);
-      outputPath = args[4];
+      outputPath = args[0];
+//      System.out.println(outputPath);
+      ipAddress = args[1];
+      maxThread = Integer.parseInt(args[2]);
     }
 
     logger.info("*********** Parameters ***********");

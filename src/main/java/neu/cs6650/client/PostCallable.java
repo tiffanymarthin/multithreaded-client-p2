@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import neu.cs6650.Configuration;
 import neu.cs6650.model.LatencyRecord;
 import neu.cs6650.model.ThreadInput;
 import neu.cs6650.model.ThreadRecord;
@@ -29,8 +31,8 @@ public class PostCallable implements Callable<ThreadRecord> {
   private String poisonPill;
   private List<LatencyRecord> latencyList;
 
-//  private final static String WEB_APP = "java-servlet";
-  private final static String WEB_APP = "java_servlet_rmq";
+  private final static String WEB_APP = "java-servlet";
+//  private final static String WEB_APP = Configuration.IS_LOCAL ? "java_servlet_rmq" : "java-servlet";
   private final static String API_PATH = "textbody";
   private final static String CONTENT_TYPE = "application/json; charset=utf-8";
 
